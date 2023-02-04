@@ -40,7 +40,7 @@ export function WSCKLoginAPI(body) {
 
 export function getWSCKUserinfoAPI(eid) {
   const searchParams = new URLSearchParams()
-  searchParams.set('wseid', wseid)
+  searchParams.set('wseid', eid)
   return api.get('WSCKUserinfo', { searchParams: searchParams }).json()
 }
 

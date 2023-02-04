@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import { getUserInfoAPI, delAccountAPI, remarkupdateAPI, WSCKLoginAPI, WSCKDelaccountAPI, remarkupdateWSCKAPI } from '@/api/index'
+import { getUserInfoAPI, delAccountAPI, remarkupdateAPI, WSCKLoginAPI, WSCKDelaccountAPI, remarkupdateWSCKAPI,getWSCKUserinfoAPI } from '@/api/index'
 import { onMounted, reactive, toRefs } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -136,14 +136,10 @@ export default {
     const delAccount = async () => {
       const eid = localStorage.getItem('eid')
       const body = await delAccountAPI({ eid })
-      if (body.code !== 200) {
-        ElMessage.error(body.message)
-      } else {
-        ElMessage.success(body.message)
-        setTimeout(() => {
-          logout()
-        }, 1000)
-      }
+      ElMessage.success(body.message)
+      setTimeout(() => {
+        logout()
+      }, 1000)
     }
     
     const changeremark = async () => {
@@ -191,14 +187,10 @@ export default {
     const delWSCKAccount = async () => {
       const wseid = localStorage.getItem('wseid')
       const body = await WSCKDelaccountAPI({ wseid })
-      if (body.code !== 200) {
-        ElMessage.error(body.message)
-      } else {
-        ElMessage.success(body.message)
-        setTimeout(() => {
-          logout()
-        }, 1000)
-      }
+      ElMessage.success(body.message)
+      setTimeout(() => {
+        logout()
+      }, 1000)
     }
     
     const openUrlWithJD = (url) => {

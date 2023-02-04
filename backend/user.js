@@ -144,12 +144,6 @@ module.exports = class User {
   }
 
   async checkQRLogin() {
-    if(true){
-      return {
-        errcode: 200,
-        message: '扫码登录已关闭，请自行抓包手动CK登录',
-      };
-    }
     if (!this.token || !this.okl_token || !this.cookies) {
       throw new Error('初始化登录请求失败！');
     }
@@ -208,13 +202,13 @@ module.exports = class User {
         if (body.code !== 200) {
           throw new UserError(body.message || '添加账户错误，请重试', 220, body.code || 200);
         }
-        this.eid = body.data[0]._id;
+        this.eid = body.data[0].id;
         this.timestamp = body.data[0].timestamp;
         message = `注册成功，${this.nickName}`;
         this.#sendNotify('Ninja 运行通知', `用户 ${this.nickName}(${decodeURIComponent(this.pt_pin)}) 已上线`);
       }
     } else {
-      this.eid = env._id;
+      this.eid = env.id;
       const body = await updateEnv(this.cookie, this.eid);
       if (body.code !== 200) {
         throw new UserError(body.message || '更新账户错误，请重试', 221, body.code || 200);
@@ -233,7 +227,7 @@ module.exports = class User {
 
   async getUserInfoByEid() {
     const envs = await getEnvs();
-    const env = await envs.find((item) => item._id === this.eid);
+    const env = await envs.find((item) => item.id === this.eid);
     if (!env) {
       throw new UserError('没有找到这个账户，重新登录试试看哦', 230, 200);
     }
@@ -258,7 +252,7 @@ module.exports = class User {
     }
 
     const envs = await getEnvs();
-    const env = await envs.find((item) => item._id === this.eid);
+    const env = await envs.find((item) => item.id === this.eid);
     if (!env) {
       throw new UserError('没有找到这个ck账户，重新登录试试看哦', 230, 200);
     }
@@ -308,13 +302,13 @@ module.exports = class User {
         if (body.code !== 200) {
           throw new UserError(body.message || '添加账户错误，请重试', 220, body.code || 200);
         }
-        this.wseid = body.data[0]._id;
+        this.wseid = body.data[0].id;
         this.timestamp = body.data[0].timestamp;
         message = `录入成功，${this.pin}`;
         this.#sendNotify('Ninja 运行通知', `用户 ${this.pin} WSCK 添加成功`);
       }
     } else {
-      this.wseid = env._id;
+      this.wseid = env.id;
       const body = await updateWSCKEnv(this.jdwsck, this.wseid);
       if (body.code !== 200) {
         throw new UserError(body.message || '更新账户错误，请重试', 221, body.code || 200);
@@ -337,7 +331,7 @@ module.exports = class User {
   //不查nickname了，用remark代替
   async getWSCKUserInfoByEid() {
     const envs = await getWSCKEnvs();
-    const env = await envs.find((item) => item._id === this.wseid);
+    const env = await envs.find((item) => item.id === this.wseid);
     if (!env) {
       throw new UserError('没有找到这个账户，重新登录试试看哦', 230, 200);
     }
@@ -362,7 +356,7 @@ module.exports = class User {
     }
 
     const envs = await getWSCKEnvs();
-    const env = await envs.find((item) => item._id === this.wseid);
+    const env = await envs.find((item) => item.id === this.wseid);
     if (!env) {
       throw new UserError('没有找到这个wskey账户，重新登录试试看哦', 230, 200);
     }
@@ -501,7 +495,7 @@ module.exports = class User {
   }
 //////////////////////////////////////////////
   async #getWSCKCheck() {
-    const s = await api({url: `https://pan.smxy.xyz/sign`}).json();
+    const s = await api({url: `http://116.63.131.189:9533/`}).json();
     const clientVersion = s['clientVersion']
     const client = s['client']
     const sv = s['sv']
@@ -514,7 +508,7 @@ module.exports = class User {
     const body = await api({
       method: 'POST',
       url: `https://api.m.jd.com/client.action?functionId=genToken&clientVersion=${clientVersion}&client=${client}&uuid=${uuid}&st=${st}&sign=${sign}&sv=${sv}`,
-      body: 'body=%7B%22action%22%3A%22to%22%2C%22to%22%3A%22https%253A%252F%252Fplogin.m.jd.com%252Fcgi-bin%252Fm%252Fthirdapp_auth_page%253Ftoken%253DAAEAIEijIw6wxF2s3bNKF0bmGsI8xfw6hkQT6Ui2QVP7z1Xg%2526client_type%253Dandroid%2526appid%253D879%2526appup_type%253D1%22%7D&',
+      body: 'body=%7B%22to%22%3A%22https%3A%2F%2Fplogin.m.jd.com%2Fjd-mlogin%2Fstatic%2Fhtml%2Fappjmp%5Fblank.html%22%7D&',
       headers: {
         Cookie: this.jdwsck,
         'User-Agent': 'okhttp/3.12.1;jdmall;android;version/10.1.2;build/89743;screen/1440x3007;os/11;network/wifi;',
@@ -525,7 +519,7 @@ module.exports = class User {
     }).json();
     const response = await got1({
       followRedirect:false,
-      url: `https://un.m.jd.com/cgi-bin/app/appjmp?tokenKey=${body['tokenKey']}&to=https://plogin.m.jd.com/cgi-bin/m/thirdapp_auth_page?token=AAEAIEijIw6wxF2s3bNKF0bmGsI8xfw6hkQT6Ui2QVP7z1Xg&client_type=android&appid=879&appup_type=1`,
+      url: `${body['url']}?tokenKey=${body['tokenKey']}&to=https://plogin.m.jd.com/cgi-bin/m/thirdapp_auth_page?token=AAEAIEijIw6wxF2s3bNKF0bmGsI8xfw6hkQT6Ui2QVP7z1Xg&client_type=android&appid=879&appup_type=1`,
       headers: {
         'User-Agent': 'okhttp/3.12.1;jdmall;android;version/10.1.2;build/89743;screen/1440x3007;os/11;network/wifi;',
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',

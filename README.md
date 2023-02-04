@@ -15,6 +15,7 @@
 仓库地址：https://github.com/huiyi9420/ninja
 
 ## 新
+fix bug 2023.2.4
 
 当前：增加备用接口（针对某些半黑号）
 
